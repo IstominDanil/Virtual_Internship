@@ -1,0 +1,262 @@
+openapi: 3.0.2
+info:
+  title: 'Passage API'
+  version: '0.1'
+paths:
+  /api/submitData/:
+    get:
+      summary: Возвращает список перевалов
+      operationId: listPassages
+      description: ''
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Passage'
+          description: 'Успех'
+      tags:
+      - passages
+    post:
+      summary: Создает новый перевал
+      operationId: createPassage
+      description: ''
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Passage'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Passage'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Passage'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Passage'
+          description: 'Успех'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Passage'
+          description: 'Bad request'
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Passage'
+          description: 'Ошибка при выполнении операции'
+      tags:
+      - passage
+  /api/submitData/{id}/:
+    get:
+      summary: Возвращает перевал по его ID
+      operationId: retrievePassage
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Уникальное целое число, определяющее этот перевал
+        schema:
+          type: integer
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Passage'
+          description: Успех
+        '400':
+          description: Указан не верный ID (например, не число)
+        '404':
+          description: Перевал с указанным ID не найден
+        'default':
+          description: Непредвиденная ошибка
+      tags:
+      - passage
+    patch:
+      summary: Частично изменяет перевал c ID
+      operationId: partialUpdatePassage
+      description: ''
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: Уникальное целое число, определяющее этот перевал
+        schema:
+          type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Passage'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Passage'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Passage'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Passage'
+          description: Успех
+        '400':
+          description: Указан не верный ID (например, не число)
+        '404':
+          description: Перевал с указанным ID не найден
+        'default':
+          description: Непредвиденная ошибка
+      tags:
+      - passage
+
+components:
+  schemas:
+    Passage:
+      type: object
+      title: Passage
+      description: Перевал
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Уникальное целое число, определяющее этот перевал
+          readOnly: true
+        beauty_title:
+          type: string
+          description: Префикс, вид объекта (пер., перевал)
+          maxLength: 255
+        title:
+          type: string
+          description: Название перевала
+          maxLength: 255
+        other_titles:
+          type: string
+          description: Другие названия
+          maxLength: 255
+        add_time:
+          type: string
+          format: timezone
+          description: Дата и время добавления
+          readOnly: true
+        connect:
+          type: string
+          format: text
+          description: Что связывает
+        user:
+          $ref: '#/components/schemas/User'
+        coords:
+          $ref: '#/components/schemas/Coords'
+        level:
+          $ref: '#/components/schemas/Level'
+        images:
+          type: array
+          title: List of images
+          description: Список фотографий перевала
+          items:
+            $ref: '#/components/schemas/Images'
+        status:
+          type: string
+          maxLength: 8
+          description: 'Статус модерации. Допустимые значения: "new", "pending", "accepted", "rejected"'
+      required:
+      - title
+      - user
+
+    User:
+      type: object
+      title: User
+      description: Пользователь
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 128
+          description: Адрес электронной почты
+        fam:
+          type: string
+          maxLength: 64
+          description: Фамилия
+        name:
+          type: string
+          maxLength: 64
+          description: Имя
+        otc:
+          type: string
+          maxLength: 64
+          description: Отчество
+        phone:
+          type: string
+          minLength: 11
+          maxLength: 12
+          description: Номер телефона
+      required:
+        - email
+        - fam
+        - name
+        - phone
+
+    Coords:
+      type: object
+      title: Coordinates
+      description: Координаты
+      properties:
+        latitude:
+          type: number
+          format: float
+          description: Широта
+        longitude:
+          type: number
+          format: float
+          description: Долгота
+        height:
+          type: integer
+          description: Высота
+
+    Level:
+      type: object
+      title: Levels
+      description: Уровни сложности
+      properties:
+        winter:
+          type: string
+          maxLength: 5
+          description: 'Уровень сложности для зимы. Допустимые значения: "", "1a", "1b", "2a", "2b", "3a", "3b", "3b*"'
+        summer:
+          type: string
+          maxLength: 5
+          description: 'Уровень сложности для лета. Допустимые значения: "", "1a", "1b", "2a", "2b", "3a", "3b", "3b*"'
+        autumn:
+          type: string
+          maxLength: 5
+          description: 'Уровень сложности для осени. Допустимые значения: "", "1a", "1b", "2a", "2b", "3a", "3b", "3b*"'
+        spring:
+          type: string
+          maxLength: 5
+          description: 'Уровень сложности для весны. Допустимые значения: "", "1a", "1b", "2a", "2b", "3a", "3b", "3b*"'
+
+    Images:
+      type: object
+      title: Images
+      description: Фотографии перевала
+      properties:
+        title:
+          type: string
+          description: Название
+          maxLength: 255
+        data:
+          type: string
+          format: url
+          description: Ссылка на фотографию
